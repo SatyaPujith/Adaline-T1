@@ -31,27 +31,6 @@ A modern React application featuring WebGL terrain rendering with smooth scroll 
 └── README.md                           # This file
 ```
 
-## What to Push to Git
-
-**Push to Git:**
-- ✅ `adaline-app/app/src/` - Source code
-- ✅ `adaline-app/app/public/` - Public assets
-- ✅ `adaline-app/app/package.json` - Dependencies
-- ✅ `adaline-app/app/tsconfig.json` - TypeScript config
-- ✅ `adaline-app/app/vite.config.ts` - Vite config
-- ✅ `adaline-app/app/tailwind.config.js` - Tailwind config
-- ✅ `adaline-app/app/postcss.config.js` - PostCSS config
-- ✅ `adaline-app/app/vercel.json` - Vercel config
-- ✅ `adaline-app/app/.gitignore` - Git ignore
-- ✅ `index.html` - Root reference file
-- ✅ `images/` - Reference images
-- ✅ `.gitignore` - Root git ignore
-- ✅ `README.md` - Documentation
-
-**Do NOT push to Git:**
-- ❌ `adaline-app/app/node_modules/` - Ignored by .gitignore
-- ❌ `adaline-app/app/dist/` - Ignored by .gitignore
-- ❌ `.env` files - Ignored by .gitignore
 
 ## Deployment on Vercel
 
