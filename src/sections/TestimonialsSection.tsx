@@ -1,142 +1,158 @@
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useState } from 'react';
 
-interface Testimonial {
-  company: string;
-  quote?: string;
-  author?: string;
-  role?: string;
-  metric?: string;
-  metricLabel?: string;
-}
+// --- Assets / Logos (SVG placeholders for now, can be replaced with images if provided) ---
+const LogoGiift = () => <span className="font-bold text-xl tracking-tight">Giift</span>;
+const LogoSerif = () => <span className="font-serif italic font-bold text-2xl">serif</span>;
+const LogoReforge = () => <span className="font-bold text-lg flex items-center gap-2"><span className="text-xl">⚡</span> Reforge</span>;
+const LogoDiscord = () => <span className="font-bold text-lg flex items-center gap-2"><span>👾</span> Discord</span>;
+const LogoSalesforce = () => <span className="font-bold text-lg flex items-center gap-2"><span>☁️</span> salesforce</span>;
+const LogoSimpleDocs = () => <span className="font-bold text-lg">SimpleDocs</span>;
+const LogoHubSpot = () => <span className="font-bold text-lg">HubSpot</span>;
+const LogoCoframe = () => <span className="font-bold text-lg flex items-center gap-2"><span>◆</span> Coframe</span>;
+const LogoJericho = () => <span className="font-bold text-lg flex items-center gap-2"><span>🛡️</span> Jericho Security</span>;
+const LogoStatflo = () => <span className="font-bold text-lg">STATFLO</span>;
+const LogoDoorDash = () => <span className="font-bold text-lg flex items-center gap-2"><span>🚗</span> DOORDASH</span>;
+const LogoMcKinsey = () => <span className="font-serif font-bold text-lg">McKinsey & Company</span>;
+const LogoDaybreak = () => <span className="font-bold text-lg">Daybreak ☀️</span>;
 
-const testimonials: Testimonial[] = [
+
+// --- Types ---
+type CardContent = {
+  type: 'logo' | 'stat' | 'quote';
+  content: React.ReactNode;
+};
+
+type TestimonialItem = {
+  id: string;
+  default: CardContent;
+  hover: CardContent;
+};
+
+// --- Data ---
+// --- Data ---
+const gridItems: TestimonialItem[] = [
+  // Row 1
   {
-    company: 'Jericho Security',
-    quote: '"Adaline has become a crucial part of our tech stack... brought our insufficient answer rate down to practically 0%."',
-    author: 'Eshan A.',
-    role: 'CEO @ Epsilon',
+    id: 'giift',
+    default: { type: 'logo', content: <LogoGiift /> },
+    hover: { type: 'quote', content: <div className="text-sm">"Adaline helps us iterate faster."</div> }
   },
   {
-    company: '15Five',
-    metric: '75%',
-    metricLabel: 'Faster iterations',
+    id: 'serif',
+    default: { type: 'logo', content: <LogoSerif /> },
+    hover: { type: 'quote', content: <div className="text-sm">"Integration was seamless."</div> }
   },
   {
-    company: 'Discord',
-    quote: '"... Adaline is simply the best platform I\'ve found that bridges the gap between technical & nontechnical LLM development ..."',
-    author: 'Ian W.',
-    role: 'Senior Staff Engineer @ Discord',
+    id: '15five-stat',
+    default: { type: 'stat', content: <div className="text-center"><div className="text-4xl md:text-5xl font-medium mb-2">75%</div><div className="text-sm text-muted-foreground">Faster iterations</div></div> },
+    hover: { type: 'logo', content: <span className="font-bold">15Five</span> }
   },
   {
-    company: 'Coframe',
-    metric: '40%',
-    metricLabel: 'Productivity boost',
+    id: 'epsilon-quote',
+    default: { type: 'quote', content: <div className="text-sm md:text-base leading-relaxed">"Adaline has become a crucial part of our tech stack ... brought our insufficient answer rate down to practically 0%." <br /><br /><span className="text-xs text-muted-foreground font-semibold">Eshan A. - CEO @ Epsilon</span></div> },
+    hover: { type: 'logo', content: <LogoJericho /> }
+  },
+
+  // Row 2
+  {
+    id: 'reforge',
+    default: { type: 'logo', content: <LogoReforge /> },
+    hover: { type: 'quote', content: <div className="text-sm">"A game changer for our product teams."</div> }
   },
   {
-    company: 'serif',
+    id: 'discord-quote',
+    default: { type: 'quote', content: <div className="text-sm md:text-base leading-relaxed">"... Adaline is simply the best platform I've found that bridges the gap between technical & nontechnical LLM development ..." <br /><br /><span className="text-xs text-muted-foreground font-semibold">Ian W. - Senior Staff Engineer @ Discord</span></div> },
+    hover: { type: 'logo', content: <LogoDiscord /> }
   },
   {
-    company: 'Jusbrasil',
-    quote: '"Adaline has become an invaluable tool for my team to develop GenAI products..."',
-    author: 'Tan S.',
-    role: 'Product Manager for Lilli @ McKinsey & Company',
+    id: 'coframe-stat',
+    default: { type: 'stat', content: <div className="text-center"><div className="text-4xl md:text-5xl font-medium mb-2">40%</div><div className="text-sm text-muted-foreground">Productivity boost</div></div> },
+    hover: { type: 'logo', content: <LogoCoframe /> }
   },
   {
-    company: 'Daybreak',
-    quote: '"Before Adaline, iterating and evaluating prompts was a nightmare ... Adaline totally changes the game here."',
-    author: 'Josh P.',
-    role: 'CEO @ Coframe',
-  },
-  {
-    company: 'Reforge',
+    id: 'lilli-quote',
+    default: { type: 'quote', content: <div className="text-sm md:text-base leading-relaxed">"Adaline has become an invaluable tool for my team to develop GenAI products..." <br /><br /><span className="text-xs text-muted-foreground font-semibold">Tan S. - Product Manager for Lilli @ McKinsey & Company</span></div> },
+    hover: { type: 'logo', content: <LogoMcKinsey /> }
   },
 ];
 
-const companyLogos: Record<string, React.ReactNode> = {
-  'Jericho Security': <span className="font-semibold">Jericho Security</span>,
-  '15Five': <span className="font-semibold">15Five</span>,
-  'Discord': <span className="font-semibold">Discord</span>,
-  'Coframe': <span className="font-semibold">Coframe</span>,
-  'serif': <span className="font-bold italic text-xl">serif</span>,
-  'Jusbrasil': <span className="font-semibold">Jusbrasil</span>,
-  'Daybreak': <span className="font-semibold">Daybreak</span>,
-  'Reforge': <span className="font-semibold">Reforge</span>,
+// --- Component ---
+const TestimonialCard = ({ item }: { item: TestimonialItem }) => {
+  const [isHovered, setIsHovered] = useState(false);
+
+  return (
+    <div
+      className="group relative h-64 sm:h-72 border-r border-b border-stone-200 border-dashed bg-[#fdfcf8] overflow-hidden cursor-default transition-colors"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <AnimatePresence mode="wait">
+        {!isHovered ? (
+          <motion.div
+            key="default"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.2 }}
+            className="absolute inset-0 flex items-center justify-center p-8 text-[#1c1c1c]"
+          >
+            {item.default.content}
+          </motion.div>
+        ) : (
+          <motion.div
+            key="hover"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.2 }}
+            className="absolute inset-0 flex items-center justify-center p-8 text-[#1c1c1c]"
+          >
+            {item.hover.content}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
 };
 
 const TestimonialsSection = () => {
   return (
-    <section className="py-24 px-4 sm:px-6 lg:px-8 bg-background">
-      <div className="max-w-7xl mx-auto">
+    <section className="bg-background pt-24 pb-0 border-t border-stone-200 border-dashed">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-24">
         {/* Header */}
-        <div className="text-center mb-16">
+        <div className="text-center mb-20">
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.3 }}
-            className="text-3xl sm:text-4xl font-medium tracking-tight text-foreground mb-4"
+            className="text-4xl sm:text-5xl md:text-6xl font-normal tracking-tight text-[#1c1c1c] mb-6"
           >
-            Powering global brands and fast scaling startups
+            Powering global brands<br />and fast scaling startups
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.3, delay: 0.05 }}
-            className="text-muted-foreground max-w-2xl mx-auto"
+            transition={{ duration: 0.3, delay: 0.1 }}
+            className="text-stone-600 max-w-2xl mx-auto leading-relaxed"
           >
-            From ambitious startups to global enterprises, Adaline helps world-class teams iterate quickly and ship confidently.
+            From ambitious startups to global enterprises, Adaline helps<br className="hidden sm:block" /> world-class teams iterate quickly and ship confidently.
           </motion.p>
         </div>
+      </div>
 
-        {/* Bento Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {testimonials.map((testimonial, index) => (
-            <motion.div
-              key={testimonial.company}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.3, delay: index * 0.03 }}
-              className={`bg-white border border-border rounded-xl p-4 sm:p-6 ${
-                testimonial.quote ? 'sm:col-span-2 lg:row-span-2' : ''
-              } ${testimonial.metric ? 'flex flex-col justify-center items-center text-center' : ''}`}
-            >
-              {/* Company Logo */}
-              <div className="mb-4 text-muted-foreground">
-                {companyLogos[testimonial.company]}
-              </div>
-
-              {/* Quote */}
-              {testimonial.quote && (
-                <>
-                  <p className="text-foreground mb-4 text-sm leading-relaxed">
-                    {testimonial.quote}
-                  </p>
-                  {testimonial.author && (
-                    <p className="text-xs text-muted-foreground">
-                      {testimonial.author}
-                      {testimonial.role && ` - ${testimonial.role}`}
-                    </p>
-                  )}
-                </>
-              )}
-
-              {/* Metric */}
-              {testimonial.metric && (
-                <>
-                  <div className="text-4xl font-medium text-foreground mb-2">
-                    {testimonial.metric}
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    {testimonial.metricLabel}
-                  </p>
-                </>
-              )}
-            </motion.div>
+      {/* Full Width Grid */}
+      <div className="w-full border-t border-stone-200 border-dashed">
+        <div className="max-w-[1920px] mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 border-l border-stone-200 border-dashed">
+          {gridItems.map((item) => (
+            <TestimonialCard key={item.id} item={item} />
           ))}
         </div>
       </div>
+
+      {/* Bottom spacer or border if needed */}
+      <div className="w-full h-px bg-transparent" />
     </section>
   );
 };

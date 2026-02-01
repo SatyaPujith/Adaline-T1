@@ -1,133 +1,221 @@
 import { useRef, useEffect } from 'react';
-import { motion, useInView, useMotionValue, useTransform, animate } from 'framer-motion';
+import { motion, useInView, useSpring, useTransform } from 'framer-motion';
 
-interface Stat {
-  value: string;
-  label: string;
-  suffix?: string;
-  description: string;
-}
 
-const stats: Stat[] = [
-  { value: '200', label: 'M+', suffix: 'M+', description: 'API calls per day' },
-  { value: '5', label: 'B+', suffix: 'B+', description: 'Tokens per day' },
-  { value: '300', label: '+', suffix: '+', description: 'Number of AI models' },
-  { value: '99.978', label: '%', suffix: '%', description: 'Historical uptime' },
-];
+// --- Badge Icons ---
+const BadgeSOC2 = () => (
+  <div className="w-12 h-12 rounded-full border border-stone-300 flex items-center justify-center bg-[#fdfcf8] text-[8px] font-mono text-center p-1 leading-tight text-stone-600">
+    AICPA<br /><span className="font-bold">SOC2</span>
+  </div>
+);
+const BadgeGDPR = () => (
+  <div className="w-12 h-12 rounded-full border border-stone-300 flex items-center justify-center bg-[#fdfcf8] text-[8px] font-mono p-1 text-stone-600">
+    ★ GDPR ★
+  </div>
+);
+const BadgeHIPAA = () => (
+  <div className="w-12 h-12 rounded-full border border-stone-300 flex items-center justify-center bg-[#fdfcf8] text-[8px] font-mono text-center p-1 leading-tight text-stone-600">
+    HIPAA<br />COMPLIANT
+  </div>
+);
 
-const AnimatedNumber = ({ value, suffix }: { value: string; suffix?: string }) => {
+// --- Animated Counter Component ---
+const Counter = ({ value }: { value: string }) => {
   const ref = useRef<HTMLSpanElement>(null);
-  const isInView = useInView(ref, { once: true, margin: '-100px' });
-  const count = useMotionValue(0);
-  const rounded = useTransform(count, (latest) => {
-    if (value.includes('.')) {
-      return latest.toFixed(3);
+  const isInView = useInView(ref, { once: true, margin: "-100px" });
+
+  // Parse the number and suffix
+  const numericValue = parseFloat(value.replace(/[^0-9.]/g, ''));
+  const suffix = value.replace(/[0-9.]/g, '');
+  const decimals = value.includes('.') ? value.split('.')[1].replace(/[^0-9]/g, '').length : 0;
+
+  const spring = useSpring(0, { mass: 0.8, stiffness: 75, damping: 15 });
+  const display = useTransform(spring, (current) => {
+    // Format based on decimals
+    if (decimals > 0) {
+      return current.toFixed(decimals) + suffix;
     }
-    return Math.round(latest).toString();
+    return Math.floor(current).toLocaleString() + suffix;
   });
 
   useEffect(() => {
     if (isInView) {
-      const numericValue = parseFloat(value);
-      const controls = animate(count, numericValue, {
-        duration: 2,
-        ease: [0.4, 0, 0.2, 1],
-      });
-      return controls.stop;
+      spring.set(numericValue);
     }
-  }, [isInView, value, count]);
+  }, [isInView, numericValue, spring]);
 
-  return (
-    <span ref={ref} className="inline-flex items-baseline">
-      <motion.span>{rounded}</motion.span>
-      {suffix && <span>{suffix}</span>}
-    </span>
-  );
+  return <motion.span ref={ref}>{display}</motion.span>;
 };
+
+
+const reliabilityStats = [
+  { value: '200M+', label: 'API calls\nper day', desc: 'Handles massive\nscale effortlessly' },
+  { value: '5B+', label: 'Tokens\nper day', desc: 'Built for limitless\nprocessing power' },
+  { value: '300+', label: 'Number of\nAI models', desc: 'Flexibility for\nevery application' },
+  { value: '99.998%', label: 'Historical\nuptime', desc: 'Always on,\nalways reliable' },
+];
 
 const StatsSection = () => {
   return (
-    <section className="py-24 px-4 sm:px-6 lg:px-8 bg-background">
+    <section className="py-24 px-4 sm:px-6 lg:px-8 bg-background mb-24">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-16">
+
+        {/* --- PART 1: Architecture --- */}
+
+        {/* Header Block */}
+        <div className="mb-12">
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.3 }}
-            className="text-3xl sm:text-4xl font-medium tracking-tight text-foreground mb-4"
+            className="text-4xl sm:text-5xl md:text-6xl font-normal tracking-tight text-[#1c1c1c] mb-8 max-w-4xl"
           >
-            Precisely engineered for unparalleled reliability
+            For world-class product<br className="hidden sm:block" /> and engineering teams
           </motion.h2>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.3, delay: 0.05 }}
-            className="text-muted-foreground max-w-2xl mx-auto"
-          >
-            Adaline powers the workflows of world-class product and engineering teams with unmatched performance and reliability.
-          </motion.p>
-        </div>
 
-        {/* Stats Grid */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
-          {stats.map((stat, index) => (
-            <motion.div
-              key={stat.description}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="text-center"
-            >
-              <div className="text-4xl sm:text-5xl font-medium tracking-tight text-foreground mb-2">
-                <AnimatedNumber value={stat.value} suffix={stat.suffix} />
-              </div>
-              <p className="text-sm text-muted-foreground">{stat.description}</p>
-            </motion.div>
-          ))}
-        </div>
-
-        {/* Architecture Diagram */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="relative px-4"
-        >
-          <img
-            src="/images/architecture-diagram.jpg"
-            alt="Technical architecture diagram"
-            className="w-full max-w-3xl mx-auto rounded-lg"
-            onError={(e) => {
-              e.currentTarget.style.backgroundColor = '#f5f5f0';
-            }}
-          />
-        </motion.div>
-
-        {/* Bottom Stats */}
-        <div className="grid sm:grid-cols-3 gap-8 mt-16 pt-16 border-t border-border">
-          {[
-            { label: 'Speed', desc: 'Move fast without compromise' },
-            { label: 'Security', desc: 'Protection at every step' },
-            { label: 'Scale', desc: 'A platform that grows with you' },
-          ].map((item, index) => (
-            <motion.div
-              key={item.label}
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-stone-200">
+            <motion.p
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="text-center"
+              transition={{ delay: 0.1 }}
+              className="text-lg text-stone-600 max-w-xl leading-relaxed"
             >
-              <h3 className="font-medium text-foreground mb-2">{item.label}</h3>
-              <p className="text-sm text-muted-foreground">{item.desc}</p>
-            </motion.div>
-          ))}
+              Adaline is the end-to-end platform for world-class product and engineering teams building AI-powered applications.
+            </motion.p>
+
+            <motion.button
+              initial={{ opacity: 0, x: 20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+              className="bg-[#2e2b26] hover:bg-[#1a1916] text-[#fdfcf8] px-6 py-3 rounded-full font-medium text-sm tracking-wide transition-colors"
+            >
+              START FOR FREE
+            </motion.button>
+          </div>
         </div>
+
+        {/* Architect Image */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.98 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+          className="my-12"
+        >
+          <div className="max-w-4xl mx-auto border border-stone-800/10 bg-[#fdfcf8] p-2 sm:p-4 rounded-sm">
+            <img
+              src="/images/architecture-diagram.jpg"
+              alt="Adaline Platform Architecture"
+              className="w-full h-auto opacity-90 mix-blend-multiply"
+            />
+          </div>
+        </motion.div>
+
+        {/* Footer Stats/Info */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 pt-8 px-2">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+          >
+            <h3 className="font-semibold text-lg text-[#1c1c1c] mb-2">Speed</h3>
+            <p className="text-stone-600 text-sm">Move fast without compromise</p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
+          >
+            <h3 className="font-semibold text-lg text-[#1c1c1c] mb-2">Security</h3>
+            <p className="text-stone-600 text-sm">Protection at every step</p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.3 }}
+          >
+            <h3 className="font-semibold text-lg text-[#1c1c1c] mb-2">Scale</h3>
+            <p className="text-stone-600 text-sm">A platform that grows with you</p>
+          </motion.div>
+
+          {/* Badges Column */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.4 }}
+            className="flex items-center gap-3 md:justify-end"
+          >
+            <BadgeSOC2 />
+            <BadgeGDPR />
+            <BadgeHIPAA />
+          </motion.div>
+        </div>
+
+
+        {/* --- PART 2: Reliability --- */}
+        <div className="mt-40 mb-20 max-w-4xl mx-auto">
+          {/* Header */}
+          <div className="mb-16">
+            <motion.h2
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-4xl sm:text-5xl font-normal tracking-tight text-[#1c1c1c] mb-6"
+            >
+              Precisely engineered for<br />unparalleled reliability
+            </motion.h2>
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+              className="text-stone-600 max-w-lg leading-relaxed text-sm sm:text-base"
+            >
+              Adaline powers the workflows of world-class product and engineering teams with unmatched performance and reliability.
+            </motion.p>
+          </div>
+
+          {/* Stats List */}
+          <div className="border-t border-stone-800/10">
+            <div className="divide-y divide-stone-800/10 border-b border-stone-800/10 border-dashed">
+              {reliabilityStats.map((stat, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 10 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.1 }}
+                  className="grid grid-cols-1 sm:grid-cols-12 py-8 sm:py-10 items-start sm:items-center gap-4 border-dashed border-stone-300"
+                  style={{ borderBottomStyle: 'dashed' }}
+                >
+                  {/* Value */}
+                  <div className="sm:col-span-5 text-4xl sm:text-5xl md:text-6xl font-normal text-[#1c1c1c] tracking-tight tabular-nums">
+                    <Counter value={stat.value} />
+                  </div>
+
+                  {/* Label */}
+                  <div className="sm:col-span-3 text-xs sm:text-sm font-medium text-stone-500 uppercase tracking-wide whitespace-pre-line">
+                    {stat.label}
+                  </div>
+
+                  {/* Desc */}
+                  <div className="sm:col-span-4 text-xs sm:text-sm text-stone-500 whitespace-pre-line">
+                    {stat.desc}
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </div>
+
       </div>
     </section>
   );

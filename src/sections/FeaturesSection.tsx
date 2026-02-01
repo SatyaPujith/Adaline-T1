@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, useScroll, AnimatePresence } from 'framer-motion';
+import { FeatureVisuals } from '../components/FeatureVisuals';
 
 interface FeatureStep {
   id: number;
@@ -66,45 +67,35 @@ const features: FeatureStep[] = [
   },
 ];
 
-const FloatingImage = ({ src, style, delay = 0 }: { src: string; style: React.CSSProperties; delay?: number }) => (
-  <motion.div
-    initial={{ opacity: 0, scale: 0.8 }}
-    animate={{ opacity: 1, scale: 1 }}
-    exit={{ opacity: 0, scale: 0.8 }}
-    transition={{ duration: 0.3, delay }}
-    className="absolute bg-white rounded-lg shadow-lg overflow-hidden"
-    style={{
-      ...style,
-      maxWidth: '100%',
-      maxHeight: '100%',
-    }}
-  >
-    <img src={src} alt="" className="w-full h-full object-contain" loading="lazy" />
-  </motion.div>
-);
 
 const FeaturesSection = () => {
   const [activeFeature, setActiveFeature] = useState(0);
   const [activeSubStep, setActiveSubStep] = useState(0);
   const [activeTab, setActiveTab] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
-  
+
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ['start start', 'end end'],
   });
 
-  // Auto-advance feature based on scroll
+  // Auto-advance feature AND sub-step based on scroll
   useEffect(() => {
     const unsubscribe = scrollYProgress.on('change', (value) => {
-      const newFeature = Math.min(Math.floor(value * 4), 3);
-      if (newFeature !== activeFeature) {
+      // Total steps = 4 features * 3 substeps = 12 segments
+      const totalSegments = 12;
+      const currentSegment = Math.min(Math.floor(value * totalSegments), totalSegments - 1);
+
+      const newFeature = Math.floor(currentSegment / 3);
+      const newSubStep = currentSegment % 3;
+
+      if (newFeature !== activeFeature || newSubStep !== activeSubStep) {
         setActiveFeature(newFeature);
-        setActiveSubStep(0);
+        setActiveSubStep(newSubStep);
       }
     });
     return () => unsubscribe();
-  }, [scrollYProgress, activeFeature]);
+  }, [scrollYProgress, activeFeature, activeSubStep]);
 
   const currentFeature = features[activeFeature];
 
@@ -150,360 +141,240 @@ const FeaturesSection = () => {
       </div>
 
       {/* Desktop: Sticky Layout */}
-      <div className="hidden lg:block" style={{ height: '400vh' }}>
+      <div className="hidden lg:block" style={{ height: '600vh' }}>
         <div className="sticky top-0 h-screen bg-white overflow-hidden relative">
-        {/* Step Indicators */}
-        <div className="absolute top-14 sm:top-16 lg:top-20 left-3 sm:left-4 lg:left-8 right-3 sm:right-4 lg:right-8 flex items-center justify-between z-20 overflow-x-auto pb-2 gap-2 sm:gap-4">
-          {features.map((feature, index) => (
-            <motion.button
-              key={feature.id}
-              onClick={() => {
-                setActiveFeature(index);
-                setActiveSubStep(0);
-              }}
-              className="flex items-center space-x-1 sm:space-x-2 lg:space-x-3 group flex-shrink-0"
-              whileHover={{ scale: 1.02 }}
-            >
-              {/* Animated Circle */}
-              <div className="relative w-8 sm:w-10 lg:w-12 h-8 sm:h-10 lg:h-12">
-                <motion.svg
-                  width="48"
-                  height="48"
-                  viewBox="0 0 48 48"
-                  className="transform"
-                >
-                  {/* Outer ring - solid when active, dashed when inactive */}
-                  <motion.circle
-                    cx="24"
-                    cy="24"
-                    r="20"
-                    fill="none"
-                    stroke={index === activeFeature ? "#1a1a1a" : "#e5e5e5"}
-                    strokeWidth="1.5"
-                    strokeDasharray={index === activeFeature ? "" : "4 4"}
-                    initial={false}
-                    animate={{ 
-                      stroke: index === activeFeature ? "#1a1a1a" : "#e5e5e5",
-                      rotate: index === activeFeature ? 0 : 360
+          {/* Step Indicators & Tabs Header */}
+          <div className="absolute top-24 left-4 right-4 lg:left-12 lg:right-12 flex items-start justify-between z-20 pointer-events-none">
+            {/* Steps (Left) */}
+            <div className="flex items-start gap-4 pointer-events-auto overflow-x-auto no-scrollbar max-w-[70%]">
+              {features.map((feature, index) => {
+                const isActive = index === activeFeature;
+                return (
+                  <motion.button
+                    key={feature.id}
+                    onClick={() => {
+                      setActiveFeature(index);
+                      setActiveSubStep(0);
                     }}
-                    transition={{ duration: 0.3 }}
-                  />
-                  {/* Inner crosshair */}
-                  {index === activeFeature && (
-                    <>
-                      <line x1="24" y1="14" x2="24" y2="34" stroke="#1a1a1a" strokeWidth="1" />
-                      <line x1="14" y1="24" x2="34" y2="24" stroke="#1a1a1a" strokeWidth="1" />
-                    </>
-                  )}
-                </motion.svg>
-                {/* Step number */}
-                <div className="absolute -top-1 -right-1 w-5 h-5 bg-[#2D4A2D] text-white text-[10px] font-medium rounded-full flex items-center justify-center">
-                  {feature.stepNum}
-                </div>
-              </div>
-              
-              <div className="text-left hidden sm:block">
-                <span className={`text-xs font-medium transition-colors ${
-                  index === activeFeature ? 'text-foreground' : 'text-muted-foreground'
-                }`}>
-                  {feature.name}
-                </span>
-                {/* Progress indicator */}
-                {index === activeFeature && (
-                  <div className="flex space-x-0.5 mt-1">
-                    {[0, 1, 2].map((i) => (
-                      <motion.div
-                        key={i}
-                        initial={{ width: 0 }}
-                        animate={{ width: i <= activeSubStep ? 16 : 4 }}
-                        className={`h-0.5 ${i <= activeSubStep ? 'bg-[#2D4A2D]' : 'bg-border'}`}
-                        transition={{ duration: 0.3 }}
-                      />
-                    ))}
-                  </div>
-                )}
-              </div>
-            </motion.button>
-          ))}
-        </div>
+                    className={`flex items-center gap-3 px-2 py-2 rounded-full transition-all duration-300 flex-shrink-0 group ${isActive
+                      ? 'bg-white shadow-sm border border-border/50 min-w-[180px]'
+                      : 'bg-transparent hover:bg-muted/30'
+                      }`}
+                  >
+                    {/* Custom Animated Icon */}
+                    <div className="relative w-8 h-8 flex-shrink-0">
+                      <motion.svg
+                        width="32"
+                        height="32"
+                        viewBox="0 0 40 40"
+                        className={`${isActive ? 'text-[#2D4A2D]' : 'text-muted-foreground group-hover:text-foreground'}`}
+                        animate={isActive ? { rotate: 360 } : { rotate: 0 }}
+                        transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                      >
+                        {/* Iterate - Decagon */}
+                        {index === 0 && (
+                          <motion.path
+                            d="M20,2 L29.51,5.09 L35.39,13.18 L35.39,23.18 L29.51,31.27 L20,34.36 L10.49,31.27 L4.61,23.18 L4.61,13.18 L10.49,5.09 Z"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="1.5"
+                            strokeLinejoin="round"
+                            vectorEffect="non-scaling-stroke"
+                            transform="translate(0, 2)"
+                          />
+                        )}
 
-        {/* Main Content */}
-        <div className="absolute top-20 sm:top-20 lg:top-36 left-3 sm:left-4 lg:left-8 right-3 sm:right-4 lg:right-8 bottom-3 sm:bottom-4 lg:bottom-8 grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-12 h-full">
-          {/* Left - Text Content */}
-          <div className="flex flex-col min-h-0 overflow-hidden">
-            {/* Tabs */}
-            <div className="flex items-center space-x-1 bg-muted rounded-lg p-1 mb-3 sm:mb-4 lg:mb-6 w-fit overflow-x-auto flex-shrink-0">
+                        {/* Evaluate - Dashed Circle */}
+                        {index === 1 && (
+                          <circle
+                            cx="20"
+                            cy="20"
+                            r="18"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="1.5"
+                            strokeDasharray="4 4"
+                          />
+                        )}
+
+                        {/* Deploy - Segmented/Notched Circle */}
+                        {index === 2 && (
+                          <>
+                            <circle
+                              cx="20"
+                              cy="20"
+                              r="18"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="1.5"
+                            />
+                            <motion.path
+                              d="M20 2 L20 10 M38 20 L30 20 M20 38 L20 30 M2 20 L10 20"
+                              stroke="currentColor"
+                              strokeWidth="1.5"
+                            />
+                          </>
+                        )}
+
+                        {/* Monitor - Double Circle */}
+                        {index === 3 && (
+                          <>
+                            <circle
+                              cx="20"
+                              cy="20"
+                              r="18"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="1"
+                              strokeDasharray="4 4"
+                            />
+                            <circle
+                              cx="20"
+                              cy="20"
+                              r="13"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="1.5"
+                            />
+                          </>
+                        )}
+                      </motion.svg>
+
+                      {/* Step Number in Center */}
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <span className={`text-[9px] font-semibold ${isActive ? 'text-[#2D4A2D]' : 'text-muted-foreground'} bg-transparent px-1`}>
+                          {feature.stepNum}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Text Content */}
+                    <div className={`flex flex-col items-start ${isActive ? 'min-w-[100px] flex-1 mr-2' : ''}`}>
+                      <div className="flex items-center justify-between w-full gap-2">
+                        <span className={`text-sm font-medium ${isActive ? 'text-[#1a1a1a]' : 'text-muted-foreground/80'
+                          }`}>
+                          {feature.name}
+                        </span>
+
+                        {isActive && (
+                          <span className="text-[10px] text-muted-foreground tabular-nums">
+                            {activeSubStep + 1}/{feature.subSteps.length}
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Progress Bars */}
+                      {isActive && (
+                        <div className="flex gap-1 mt-1.5 w-full">
+                          {feature.subSteps.map((_, i) => (
+                            <div
+                              key={i}
+                              className={`h-0.5 flex-1 rounded-full transition-colors duration-300 ${i <= activeSubStep ? 'bg-[#1a1a1a]' : 'bg-border'
+                                }`}
+                            />
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </motion.button>
+                );
+              })}
+            </div>
+
+            {/* Tabs (Right) */}
+            <div className="hidden lg:flex pointer-events-auto bg-muted/50 p-1 rounded-lg backdrop-blur-sm">
               {currentFeature.tabs.map((tab, index) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(index)}
-                  className={`px-2 sm:px-3 py-1 sm:py-1.5 text-[9px] sm:text-xs font-medium rounded-md transition-all whitespace-nowrap ${
-                    activeTab === index
-                      ? 'bg-white text-foreground shadow-sm'
-                      : 'text-muted-foreground hover:text-foreground'
-                  }`}
+                  className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all whitespace-nowrap ${activeTab === index
+                    ? 'bg-white text-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
+                    }`}
                 >
                   {tab}
                 </button>
               ))}
             </div>
+          </div>
 
-            {/* Title & Description */}
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={currentFeature.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.4 }}
-                className="flex-shrink-0"
-              >
-                <h2 className="text-sm sm:text-base lg:text-2xl font-medium text-foreground mb-1.5 sm:mb-2 lg:mb-3 leading-tight">
-                  {currentFeature.title}
-                </h2>
-                <p className="text-muted-foreground text-[10px] sm:text-xs lg:text-sm mb-3 sm:mb-4 lg:mb-6 max-w-md line-clamp-2 sm:line-clamp-3 lg:line-clamp-none">
-                  {currentFeature.description}
-                </p>
-              </motion.div>
-            </AnimatePresence>
-
-            {/* Sub-steps Accordion */}
-            <div className="space-y-0 flex-1 overflow-y-auto min-h-0">
-              {currentFeature.subSteps.map((subStep, index) => (
+          {/* Main Content */}
+          <div className="absolute top-28 sm:top-28 lg:top-52 left-4 sm:left-4 lg:left-12 right-4 sm:right-4 lg:right-12 bottom-4 sm:bottom-4 lg:bottom-12 grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-16 h-full">
+            {/* Left - Text Content */}
+            <div className="flex flex-col min-h-0 overflow-hidden pt-4">
+              {/* Title & Description */}
+              <AnimatePresence mode="wait">
                 <motion.div
-                  key={subStep.title}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  className="border-t border-border"
+                  key={currentFeature.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.4 }}
+                  className="flex-shrink-0"
                 >
-                  <button
-                    onClick={() => setActiveSubStep(index)}
-                    className="w-full py-2 sm:py-2.5 lg:py-3 text-left group"
-                  >
-                    <div className="flex items-start space-x-2 sm:space-x-2.5 lg:space-x-3">
-                      <span className="text-[9px] sm:text-xs lg:text-sm text-muted-foreground mt-0.5 flex-shrink-0">
-                        {String(index + 1).padStart(2, '0')}
-                      </span>
-                      <div className="flex-1 min-w-0">
-                        <span className={`text-[10px] sm:text-xs lg:text-sm font-medium transition-colors block leading-tight ${
-                          activeSubStep === index ? 'text-foreground' : 'text-muted-foreground group-hover:text-foreground'
-                        }`}>
-                          {subStep.title}
-                        </span>
-                        <AnimatePresence>
-                          {activeSubStep === index && (
-                            <motion.p
-                              initial={{ height: 0, opacity: 0 }}
-                              animate={{ height: 'auto', opacity: 1 }}
-                              exit={{ height: 0, opacity: 0 }}
-                              transition={{ duration: 0.3 }}
-                              className="text-[9px] sm:text-xs lg:text-sm text-muted-foreground mt-1 overflow-hidden leading-snug"
-                            >
-                              {subStep.desc}
-                            </motion.p>
-                          )}
-                        </AnimatePresence>
-                      </div>
-                    </div>
-                  </button>
+                  <h2 className="text-sm sm:text-base lg:text-2xl font-medium text-foreground mb-1.5 sm:mb-2 lg:mb-3 leading-tight">
+                    {currentFeature.title}
+                  </h2>
+                  <p className="text-muted-foreground text-[10px] sm:text-xs lg:text-sm mb-3 sm:mb-4 lg:mb-6 max-w-md line-clamp-2 sm:line-clamp-3 lg:line-clamp-none">
+                    {currentFeature.description}
+                  </p>
                 </motion.div>
-              ))}
+              </AnimatePresence>
+
+              {/* Sub-steps Accordion */}
+              <div className="space-y-0 flex-1 overflow-y-auto min-h-0">
+                {currentFeature.subSteps.map((subStep, index) => (
+                  <motion.div
+                    key={subStep.title}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    className="border-t border-border"
+                  >
+                    <button
+                      onClick={() => setActiveSubStep(index)}
+                      className="w-full py-2 sm:py-2.5 lg:py-3 text-left group"
+                    >
+                      <div className="flex items-start space-x-2 sm:space-x-2.5 lg:space-x-3">
+                        <span className="text-[9px] sm:text-xs lg:text-sm text-muted-foreground mt-0.5 flex-shrink-0">
+                          {String(index + 1).padStart(2, '0')}
+                        </span>
+                        <div className="flex-1 min-w-0">
+                          <span className={`text-[10px] sm:text-xs lg:text-sm font-medium transition-colors block leading-tight ${activeSubStep === index ? 'text-foreground' : 'text-muted-foreground group-hover:text-foreground'
+                            }`}>
+                            {subStep.title}
+                          </span>
+                          <AnimatePresence>
+                            {activeSubStep === index && (
+                              <motion.p
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: 'auto', opacity: 1 }}
+                                exit={{ height: 0, opacity: 0 }}
+                                transition={{ duration: 0.3 }}
+                                className="text-[9px] sm:text-xs lg:text-sm text-muted-foreground mt-1 overflow-hidden leading-snug"
+                              >
+                                {subStep.desc}
+                              </motion.p>
+                            )}
+                          </AnimatePresence>
+                        </div>
+                      </div>
+                    </button>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+
+            {/* Right - Visual Grid - Hidden on mobile */}
+            <div className="hidden lg:block relative w-full h-full" style={{ overflow: 'hidden' }}>
+              {/* Dashed Grid Background */}
+
+              {/* Feature Visualizations */}
+              <div className="absolute inset-0 overflow-hidden">
+                <FeatureVisuals activeFeature={activeFeature} activeSubStep={activeSubStep} />
+              </div>
             </div>
           </div>
-
-          {/* Right - Visual Grid - Hidden on mobile */}
-          <div className="hidden lg:block relative w-full h-full" style={{ overflow: 'visible' }}>
-            {/* Dashed grid background */}
-            <div 
-              className="absolute inset-0 border border-dashed border-border rounded-lg"
-              style={{
-                backgroundImage: 'linear-gradient(to right, #e5e5e5 1px, transparent 1px), linear-gradient(to bottom, #e5e5e5 1px, transparent 1px)',
-                backgroundSize: '40px 40px',
-              }}
-            />
-            
-            {/* Floating images based on active feature and substep */}
-            <AnimatePresence mode="wait">
-              {activeFeature === 0 && (
-                <motion.div
-                  key="iterate"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="absolute inset-0"
-                >
-                  {activeSubStep === 0 && (
-                    <>
-                      <FloatingImage 
-                        src="/images/iterate-ui.jpg" 
-                        style={{ top: '5%', left: '5%', width: '55%', height: '50%' }}
-                        delay={0}
-                      />
-                      <FloatingImage 
-                        src="/images/blog-1.jpg" 
-                        style={{ top: '10%', right: '5%', width: '30%', height: '25%' }}
-                        delay={0.1}
-                      />
-                    </>
-                  )}
-                  {activeSubStep === 1 && (
-                    <>
-                      <FloatingImage 
-                        src="/images/blog-2.jpg" 
-                        style={{ top: '15%', left: '10%', width: '35%', height: '30%' }}
-                        delay={0}
-                      />
-                      <FloatingImage 
-                        src="/images/blog-3.jpg" 
-                        style={{ top: '5%', right: '10%', width: '40%', height: '35%' }}
-                        delay={0.1}
-                      />
-                      <FloatingImage 
-                        src="/images/hero-landscape.jpg" 
-                        style={{ bottom: '15%', left: '20%', width: '50%', height: '35%' }}
-                        delay={0.2}
-                      />
-                    </>
-                  )}
-                  {activeSubStep === 2 && (
-                    <>
-                      <FloatingImage 
-                        src="/images/iterate-ui.jpg" 
-                        style={{ top: '10%', left: '5%', width: '60%', height: '55%' }}
-                        delay={0}
-                      />
-                      <FloatingImage 
-                        src="/images/evaluate-ui.jpg" 
-                        style={{ bottom: '10%', right: '5%', width: '45%', height: '40%' }}
-                        delay={0.1}
-                      />
-                    </>
-                  )}
-                </motion.div>
-              )}
-              
-              {activeFeature === 1 && (
-                <motion.div
-                  key="evaluate"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="absolute inset-0"
-                >
-                  {activeSubStep === 0 && (
-                    <FloatingImage 
-                      src="/images/evaluate-ui.jpg" 
-                      style={{ top: '10%', left: '10%', width: '70%', height: '60%' }}
-                      delay={0}
-                    />
-                  )}
-                  {activeSubStep === 1 && (
-                    <>
-                      <FloatingImage 
-                        src="/images/evaluate-ui.jpg" 
-                        style={{ top: '5%', left: '5%', width: '50%', height: '45%' }}
-                        delay={0}
-                      />
-                      <FloatingImage 
-                        src="/images/monitor-ui.jpg" 
-                        style={{ bottom: '10%', right: '10%', width: '55%', height: '50%' }}
-                        delay={0.1}
-                      />
-                    </>
-                  )}
-                  {activeSubStep === 2 && (
-                    <FloatingImage 
-                      src="/images/deploy-ui.jpg" 
-                      style={{ top: '15%', left: '15%', width: '65%', height: '55%' }}
-                      delay={0}
-                    />
-                  )}
-                </motion.div>
-              )}
-              
-              {activeFeature === 2 && (
-                <motion.div
-                  key="deploy"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="absolute inset-0"
-                  style={{ overflow: 'visible' }}
-                >
-                  {activeSubStep === 0 && (
-                    <FloatingImage 
-                      src="/images/deploy-ui.jpg" 
-                      style={{ top: '5%', left: '5%', width: '85%', height: '85%' }}
-                      delay={0}
-                    />
-                  )}
-                  {activeSubStep === 1 && (
-                    <>
-                      <FloatingImage 
-                        src="/images/iterate-ui.jpg" 
-                        style={{ top: '10%', left: '5%', width: '38%', height: '32%' }}
-                        delay={0}
-                      />
-                      <FloatingImage 
-                        src="/images/deploy-ui.jpg" 
-                        style={{ top: '50%', right: '5%', width: '38%', height: '38%' }}
-                        delay={0.1}
-                      />
-                    </>
-                  )}
-                  {activeSubStep === 2 && (
-                    <FloatingImage 
-                      src="/images/monitor-ui.jpg" 
-                      style={{ top: '8%', left: '8%', width: '75%', height: '75%' }}
-                      delay={0}
-                    />
-                  )}
-                </motion.div>
-              )}
-              
-              {activeFeature === 3 && (
-                <motion.div
-                  key="monitor"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="absolute inset-0"
-                  style={{ overflow: 'visible' }}
-                >
-                  {activeSubStep === 0 && (
-                    <FloatingImage 
-                      src="/images/monitor-ui.jpg" 
-                      style={{ top: '5%', left: '5%', width: '85%', height: '85%' }}
-                      delay={0}
-                    />
-                  )}
-                  {activeSubStep === 1 && (
-                    <>
-                      <FloatingImage 
-                        src="/images/evaluate-ui.jpg" 
-                        style={{ top: '10%', left: '5%', width: '38%', height: '32%' }}
-                        delay={0}
-                      />
-                      <FloatingImage 
-                        src="/images/monitor-ui.jpg" 
-                        style={{ top: '50%', right: '5%', width: '38%', height: '38%' }}
-                        delay={0.1}
-                      />
-                    </>
-                  )}
-                  {activeSubStep === 2 && (
-                    <FloatingImage 
-                      src="/images/cta-ui.jpg" 
-                      style={{ top: '8%', left: '8%', width: '75%', height: '75%' }}
-                      delay={0}
-                    />
-                  )}
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-        </div>
         </div>
       </div>
     </div>
