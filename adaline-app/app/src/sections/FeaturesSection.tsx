@@ -73,9 +73,13 @@ const FloatingImage = ({ src, style, delay = 0 }: { src: string; style: React.CS
     exit={{ opacity: 0, scale: 0.8 }}
     transition={{ duration: 0.3, delay }}
     className="absolute bg-white rounded-lg shadow-lg overflow-hidden"
-    style={style}
+    style={{
+      ...style,
+      maxWidth: '100%',
+      maxHeight: '100%',
+    }}
   >
-    <img src={src} alt="" className="w-full h-full object-cover" loading="lazy" />
+    <img src={src} alt="" className="w-full h-full object-contain" loading="lazy" />
   </motion.div>
 );
 
@@ -105,8 +109,49 @@ const FeaturesSection = () => {
   const currentFeature = features[activeFeature];
 
   return (
-    <div ref={containerRef} className="relative" style={{ height: '400vh' }}>
-      <div className="sticky top-0 h-screen bg-white overflow-hidden relative">
+    <div ref={containerRef} className="relative" style={{ height: 'auto' }}>
+      {/* Mobile: Vertical Stack */}
+      <div className="lg:hidden">
+        {features.map((feature) => (
+          <div key={feature.id} className="min-h-screen bg-white border-b border-border p-4 sm:p-6 flex flex-col justify-center">
+            {/* Step indicator */}
+            <div className="mb-6 flex items-center gap-3">
+              <div className="w-10 h-10 bg-[#2D4A2D] text-white rounded-full flex items-center justify-center font-semibold text-sm">
+                {feature.stepNum}
+              </div>
+              <h3 className="text-lg font-semibold text-foreground">{feature.name}</h3>
+            </div>
+
+            {/* Title */}
+            <h2 className="text-2xl font-semibold text-foreground mb-3">
+              {feature.title}
+            </h2>
+
+            {/* Description */}
+            <p className="text-muted-foreground text-sm mb-8 leading-relaxed">
+              {feature.description}
+            </p>
+
+            {/* Sub-steps */}
+            <div className="space-y-4">
+              {feature.subSteps.map((subStep, subIndex) => (
+                <div key={subStep.title} className="border-l-2 border-[#2D4A2D] pl-4">
+                  <h4 className="font-semibold text-foreground text-sm mb-1">
+                    {subIndex + 1}. {subStep.title}
+                  </h4>
+                  <p className="text-muted-foreground text-xs leading-relaxed">
+                    {subStep.desc}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Desktop: Sticky Layout */}
+      <div className="hidden lg:block" style={{ height: '400vh' }}>
+        <div className="sticky top-0 h-screen bg-white overflow-hidden relative">
         {/* Step Indicators */}
         <div className="absolute top-14 sm:top-16 lg:top-20 left-3 sm:left-4 lg:left-8 right-3 sm:right-4 lg:right-8 flex items-center justify-between z-20 overflow-x-auto pb-2 gap-2 sm:gap-4">
           {features.map((feature, index) => (
@@ -183,16 +228,16 @@ const FeaturesSection = () => {
         </div>
 
         {/* Main Content */}
-        <div className="absolute top-20 sm:top-20 lg:top-36 left-3 sm:left-4 lg:left-8 right-3 sm:right-4 lg:right-8 bottom-3 sm:bottom-4 lg:bottom-8 grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-12">
+        <div className="absolute top-20 sm:top-20 lg:top-36 left-3 sm:left-4 lg:left-8 right-3 sm:right-4 lg:right-8 bottom-3 sm:bottom-4 lg:bottom-8 grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-12 h-full">
           {/* Left - Text Content */}
-          <div className="flex flex-col min-h-0">
+          <div className="flex flex-col min-h-0 overflow-hidden">
             {/* Tabs */}
-            <div className="flex items-center space-x-1 bg-muted rounded-lg p-1 mb-4 sm:mb-6 lg:mb-8 w-fit overflow-x-auto">
+            <div className="flex items-center space-x-1 bg-muted rounded-lg p-1 mb-3 sm:mb-4 lg:mb-6 w-fit overflow-x-auto flex-shrink-0">
               {currentFeature.tabs.map((tab, index) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(index)}
-                  className={`px-2 sm:px-3 py-1 sm:py-1.5 text-[10px] sm:text-xs font-medium rounded-md transition-all whitespace-nowrap ${
+                  className={`px-2 sm:px-3 py-1 sm:py-1.5 text-[9px] sm:text-xs font-medium rounded-md transition-all whitespace-nowrap ${
                     activeTab === index
                       ? 'bg-white text-foreground shadow-sm'
                       : 'text-muted-foreground hover:text-foreground'
@@ -211,18 +256,19 @@ const FeaturesSection = () => {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.4 }}
+                className="flex-shrink-0"
               >
-                <h2 className="text-base sm:text-lg lg:text-2xl font-medium text-foreground mb-2 sm:mb-3 lg:mb-3">
+                <h2 className="text-sm sm:text-base lg:text-2xl font-medium text-foreground mb-1.5 sm:mb-2 lg:mb-3 leading-tight">
                   {currentFeature.title}
                 </h2>
-                <p className="text-muted-foreground text-[11px] sm:text-xs lg:text-sm mb-4 sm:mb-6 lg:mb-8 max-w-md line-clamp-3 sm:line-clamp-none">
+                <p className="text-muted-foreground text-[10px] sm:text-xs lg:text-sm mb-3 sm:mb-4 lg:mb-6 max-w-md line-clamp-2 sm:line-clamp-3 lg:line-clamp-none">
                   {currentFeature.description}
                 </p>
               </motion.div>
             </AnimatePresence>
 
             {/* Sub-steps Accordion */}
-            <div className="space-y-0 flex-1 overflow-y-auto max-h-[300px] sm:max-h-[400px] lg:max-h-none">
+            <div className="space-y-0 flex-1 overflow-y-auto min-h-0">
               {currentFeature.subSteps.map((subStep, index) => (
                 <motion.div
                   key={subStep.title}
@@ -233,14 +279,14 @@ const FeaturesSection = () => {
                 >
                   <button
                     onClick={() => setActiveSubStep(index)}
-                    className="w-full py-2 sm:py-3 lg:py-4 text-left group"
+                    className="w-full py-2 sm:py-2.5 lg:py-3 text-left group"
                   >
-                    <div className="flex items-start space-x-2 sm:space-x-3 lg:space-x-4">
-                      <span className="text-[10px] sm:text-xs lg:text-sm text-muted-foreground mt-0.5 flex-shrink-0">
+                    <div className="flex items-start space-x-2 sm:space-x-2.5 lg:space-x-3">
+                      <span className="text-[9px] sm:text-xs lg:text-sm text-muted-foreground mt-0.5 flex-shrink-0">
                         {String(index + 1).padStart(2, '0')}
                       </span>
                       <div className="flex-1 min-w-0">
-                        <span className={`text-[11px] sm:text-xs lg:text-sm font-medium transition-colors block ${
+                        <span className={`text-[10px] sm:text-xs lg:text-sm font-medium transition-colors block leading-tight ${
                           activeSubStep === index ? 'text-foreground' : 'text-muted-foreground group-hover:text-foreground'
                         }`}>
                           {subStep.title}
@@ -252,7 +298,7 @@ const FeaturesSection = () => {
                               animate={{ height: 'auto', opacity: 1 }}
                               exit={{ height: 0, opacity: 0 }}
                               transition={{ duration: 0.3 }}
-                              className="text-[10px] sm:text-xs lg:text-sm text-muted-foreground mt-1 sm:mt-2 overflow-hidden"
+                              className="text-[9px] sm:text-xs lg:text-sm text-muted-foreground mt-1 overflow-hidden leading-snug"
                             >
                               {subStep.desc}
                             </motion.p>
@@ -267,7 +313,7 @@ const FeaturesSection = () => {
           </div>
 
           {/* Right - Visual Grid - Hidden on mobile */}
-          <div className="hidden lg:block relative">
+          <div className="hidden lg:block relative w-full h-full" style={{ overflow: 'visible' }}>
             {/* Dashed grid background */}
             <div 
               className="absolute inset-0 border border-dashed border-border rounded-lg"
@@ -383,11 +429,12 @@ const FeaturesSection = () => {
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   className="absolute inset-0"
+                  style={{ overflow: 'visible' }}
                 >
                   {activeSubStep === 0 && (
                     <FloatingImage 
                       src="/images/deploy-ui.jpg" 
-                      style={{ top: '10%', left: '10%', width: '75%', height: '65%' }}
+                      style={{ top: '5%', left: '5%', width: '85%', height: '85%' }}
                       delay={0}
                     />
                   )}
@@ -395,12 +442,12 @@ const FeaturesSection = () => {
                     <>
                       <FloatingImage 
                         src="/images/iterate-ui.jpg" 
-                        style={{ top: '5%', left: '5%', width: '45%', height: '40%' }}
+                        style={{ top: '10%', left: '5%', width: '38%', height: '32%' }}
                         delay={0}
                       />
                       <FloatingImage 
                         src="/images/deploy-ui.jpg" 
-                        style={{ bottom: '15%', right: '5%', width: '50%', height: '45%' }}
+                        style={{ top: '50%', right: '5%', width: '38%', height: '38%' }}
                         delay={0.1}
                       />
                     </>
@@ -408,7 +455,7 @@ const FeaturesSection = () => {
                   {activeSubStep === 2 && (
                     <FloatingImage 
                       src="/images/monitor-ui.jpg" 
-                      style={{ top: '15%', left: '15%', width: '60%', height: '55%' }}
+                      style={{ top: '8%', left: '8%', width: '75%', height: '75%' }}
                       delay={0}
                     />
                   )}
@@ -422,11 +469,12 @@ const FeaturesSection = () => {
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   className="absolute inset-0"
+                  style={{ overflow: 'visible' }}
                 >
                   {activeSubStep === 0 && (
                     <FloatingImage 
                       src="/images/monitor-ui.jpg" 
-                      style={{ top: '10%', left: '5%', width: '80%', height: '70%' }}
+                      style={{ top: '5%', left: '5%', width: '85%', height: '85%' }}
                       delay={0}
                     />
                   )}
@@ -434,12 +482,12 @@ const FeaturesSection = () => {
                     <>
                       <FloatingImage 
                         src="/images/evaluate-ui.jpg" 
-                        style={{ top: '5%', left: '10%', width: '50%', height: '45%' }}
+                        style={{ top: '10%', left: '5%', width: '38%', height: '32%' }}
                         delay={0}
                       />
                       <FloatingImage 
                         src="/images/monitor-ui.jpg" 
-                        style={{ bottom: '10%', right: '10%', width: '55%', height: '50%' }}
+                        style={{ top: '50%', right: '5%', width: '38%', height: '38%' }}
                         delay={0.1}
                       />
                     </>
@@ -447,7 +495,7 @@ const FeaturesSection = () => {
                   {activeSubStep === 2 && (
                     <FloatingImage 
                       src="/images/cta-ui.jpg" 
-                      style={{ top: '15%', left: '15%', width: '65%', height: '55%' }}
+                      style={{ top: '8%', left: '8%', width: '75%', height: '75%' }}
                       delay={0}
                     />
                   )}
@@ -455,6 +503,7 @@ const FeaturesSection = () => {
               )}
             </AnimatePresence>
           </div>
+        </div>
         </div>
       </div>
     </div>

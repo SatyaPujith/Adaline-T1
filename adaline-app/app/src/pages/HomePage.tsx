@@ -19,7 +19,7 @@ const HomePage = () => {
       
       {/* Sections appear AFTER hero section scrolling is complete */}
       {/* They are positioned absolutely so they don't interfere with hero section */}
-      <div className="relative z-20 bg-[#f5f2eb]" style={{ marginTop: '500vh' }}>
+      <div className="relative z-30 bg-[#f5f2eb]" style={{ marginTop: '500vh' }}>
         <div className="transition-all duration-500 ease-out">
           <FeaturesSection />
         </div>
@@ -37,7 +37,9 @@ const HomePage = () => {
         </div>
       </div>
       
-      <Footer />
+      <footer className="relative z-40">
+        <Footer />
+      </footer>
     </div>
   );
 };
