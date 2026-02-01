@@ -160,8 +160,8 @@ const HeroSection = () => {
 
       // Update hero content
       if (heroContentRef.current) {
-        const heading = heroContentRef.current.querySelector('h1');
-        const logos = heroContentRef.current.querySelector('.trusted-logos');
+        const heading = heroContentRef.current.querySelector('h1') as HTMLElement | null;
+        const logos = heroContentRef.current.querySelector('.trusted-logos') as HTMLElement | null;
 
         const scale = 1 - (progress * 0.5);
         const fadeStart = 0.05;
