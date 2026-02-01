@@ -67,7 +67,7 @@ const Footer = () => {
           src="/images/footer-underwater.jpg"
           alt="Underwater scene"
           loading="eager"
-          className="w-full h-full object-cover absolute inset-0 z-10"
+          className="w-full h-full object-cover absolute inset-0 z-50"
           onError={(e) => {
             e.currentTarget.style.backgroundColor = '#0a1f1f';
           }}
@@ -102,7 +102,7 @@ const Footer = () => {
       </div>
 
       {/* Footer Content - Positioned below image */}
-      <div className="relative bg-[#0a1f1f] text-white py-12 sm:py-16 px-4 sm:px-6 lg:px-8 border-t border-white/10 z-30">
+      <div className="relative bg-[#0a1f1f] text-white py-12 sm:py-16 px-4 sm:px-6 lg:px-8 border-t border-white/10 z-50">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-6 sm:gap-8 lg:gap-12">
             {/* Logo & Copyright */}

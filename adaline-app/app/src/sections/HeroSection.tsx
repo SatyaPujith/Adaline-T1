@@ -158,15 +158,6 @@ const HeroSection = () => {
       const progress = window.scrollY / maxScroll;
       currentScrollProgress = progress;
 
-      // Hide canvas when scrolling past hero section
-      if (progress > 0.15) {
-        canvas.style.opacity = '0';
-        canvas.style.pointerEvents = 'none';
-      } else {
-        canvas.style.opacity = '1';
-        canvas.style.pointerEvents = 'auto';
-      }
-
       // Update hero content
       if (heroContentRef.current) {
         const heading = heroContentRef.current.querySelector('h1') as HTMLElement | null;
@@ -224,19 +215,8 @@ const HeroSection = () => {
       {/* Canvas - Fixed background */}
       <canvas
         ref={canvasRef}
-        className="block bg-[#f5f2eb]"
-        style={{ 
-          willChange: 'transform', 
-          maxWidth: '100vw', 
-          maxHeight: '100vh',
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100vh',
-          zIndex: 10,
-          pointerEvents: 'none'
-        }}
+        className="fixed top-0 left-0 w-full h-screen bg-[#f5f2eb] z-10 block"
+        style={{ willChange: 'transform', maxWidth: '100vw', maxHeight: '100vh' }}
       />
 
       {/* Hero Content - Fixed text overlay */}
