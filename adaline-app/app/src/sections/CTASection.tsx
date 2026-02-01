@@ -58,13 +58,13 @@ const CTASection = () => {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 text-center px-4 sm:px-6 lg:px-8 py-24">
+      <div className="relative z-10 text-center px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
         <motion.h2
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="text-4xl sm:text-5xl lg:text-6xl font-normal tracking-tight text-white mb-8"
+          className="text-2xl sm:text-4xl lg:text-5xl xl:text-6xl font-normal tracking-tight text-white mb-6 sm:mb-8"
         >
           Start your journey
           <br />
@@ -75,11 +75,11 @@ const CTASection = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.2 }}
+          transition={{ duration: 0.4, delay: 0.1 }}
         >
           <Link
             to="/pricing"
-            className="inline-flex items-center px-8 py-3 text-sm font-medium text-[#1a2a2a] bg-white/90 rounded-full hover:bg-white transition-colors backdrop-blur-sm"
+            className="inline-flex items-center px-6 sm:px-8 py-2.5 sm:py-3 text-xs sm:text-sm font-medium text-[#1a2a2a] bg-white/90 rounded-full hover:bg-white transition-colors backdrop-blur-sm"
           >
             START FOR FREE
           </Link>
@@ -91,14 +91,17 @@ const CTASection = () => {
         initial={{ opacity: 0, y: 50 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
-        transition={{ duration: 0.8, delay: 0.3 }}
-        className="relative z-10 w-full max-w-6xl mx-auto px-4 mt-8"
+        transition={{ duration: 0.4, delay: 0.15 }}
+        className="relative z-10 w-full max-w-6xl mx-auto px-4 mt-4 sm:mt-8 mb-8"
       >
-        <div className="relative rounded-t-xl overflow-hidden border border-white/10 shadow-2xl">
+        <div className="relative rounded-lg sm:rounded-t-xl overflow-hidden border border-white/10 shadow-2xl">
           <img
             src="/images/cta-ui.jpg"
             alt="Adaline platform interface"
             className="w-full h-auto"
+            onError={(e) => {
+              e.currentTarget.style.backgroundColor = '#4a5850';
+            }}
           />
         </div>
       </motion.div>

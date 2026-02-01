@@ -1,4 +1,3 @@
-import React from 'react';
 import { motion } from 'framer-motion';
 
 interface Testimonial {
@@ -74,7 +73,7 @@ const TestimonialsSection = () => {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.3 }}
             className="text-3xl sm:text-4xl font-medium tracking-tight text-foreground mb-4"
           >
             Powering global brands and fast scaling startups
@@ -83,7 +82,7 @@ const TestimonialsSection = () => {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.1 }}
+            transition={{ duration: 0.3, delay: 0.05 }}
             className="text-muted-foreground max-w-2xl mx-auto"
           >
             From ambitious startups to global enterprises, Adaline helps world-class teams iterate quickly and ship confidently.
@@ -91,16 +90,16 @@ const TestimonialsSection = () => {
         </div>
 
         {/* Bento Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {testimonials.map((testimonial, index) => (
             <motion.div
               key={testimonial.company}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.05 }}
-              className={`bg-white border border-border rounded-xl p-6 ${
-                testimonial.quote ? 'col-span-2 row-span-2' : ''
+              transition={{ duration: 0.3, delay: index * 0.03 }}
+              className={`bg-white border border-border rounded-xl p-4 sm:p-6 ${
+                testimonial.quote ? 'sm:col-span-2 lg:row-span-2' : ''
               } ${testimonial.metric ? 'flex flex-col justify-center items-center text-center' : ''}`}
             >
               {/* Company Logo */}

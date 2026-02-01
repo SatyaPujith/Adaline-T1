@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [productsOpen, setProductsOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -59,10 +60,10 @@ const Navbar = () => {
           : 'bg-transparent'
       }`}
     >
-      <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          {/* Left - Navigation Links */}
-          <div className="flex items-center space-x-8">
+      <nav className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-14 sm:h-16">
+          {/* Left - Navigation Links - Hidden on mobile */}
+          <div className="hidden sm:flex items-center space-x-6 lg:space-x-8">
             <div className="relative">
               <button
                 onMouseEnter={() => setProductsOpen(true)}
@@ -90,9 +91,9 @@ const Navbar = () => {
                     exit={{ opacity: 0, y: 10 }}
                     transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
                     onMouseLeave={() => setProductsOpen(false)}
-                    className="absolute top-full left-0 mt-4 w-[800px] bg-white rounded-2xl shadow-2xl border border-border p-8"
+                    className="absolute top-full left-0 mt-4 w-[90vw] sm:w-[800px] max-w-[800px] bg-white rounded-2xl shadow-2xl border border-border p-6 sm:p-8 z-50"
                   >
-                    <div className="grid grid-cols-4 gap-6">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
                       {pillars.map((pillar, index) => (
                         <motion.div
                           key={pillar.name}
@@ -192,10 +193,10 @@ const Navbar = () => {
           </div>
 
           {/* Center - Logo */}
-          <Link to="/" className="flex items-center space-x-2">
+          <Link to="/" className="flex items-center space-x-1 sm:space-x-2">
             <svg
               viewBox="0 0 24 24"
-              className="w-6 h-6"
+              className="w-5 sm:w-6 h-5 sm:h-6"
               fill="none"
               stroke="currentColor"
               strokeWidth="2"
@@ -204,12 +205,20 @@ const Navbar = () => {
               <path d="M2 17l10 5 10-5" />
               <path d="M2 12l10 5 10-5" />
             </svg>
-            <span className="text-xl font-medium tracking-tight">Adaline</span>
+            <span className="text-base sm:text-xl font-medium tracking-tight">Adaline</span>
           </Link>
 
-          {/* Right - CTAs */}
-          <div className="flex items-center space-x-4">
-            <button className="flex items-center space-x-2 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors">
+          {/* Right - CTAs - Simplified on mobile */}
+          <div className="flex items-center space-x-2 sm:space-x-4">
+            <button 
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="sm:hidden p-2 text-foreground hover:bg-muted rounded-lg transition-colors"
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={mobileMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} />
+              </svg>
+            </button>
+            <button className="hidden sm:flex items-center space-x-2 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors">
               <span>WATCH DEMO</span>
               <div className="w-6 h-6 rounded-full bg-muted flex items-center justify-center">
                 <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
@@ -219,12 +228,56 @@ const Navbar = () => {
             </button>
             <Link
               to="/pricing"
-              className="inline-flex items-center px-5 py-2.5 text-xs font-medium text-white bg-[#2D4A2D] rounded-full hover:bg-[#3D5A3D] transition-colors"
+              className="inline-flex items-center px-3 sm:px-5 py-2 sm:py-2.5 text-xs font-medium text-white bg-[#2D4A2D] rounded-full hover:bg-[#3D5A3D] transition-colors"
             >
-              START FOR FREE
+              <span className="hidden sm:inline">START FOR FREE</span>
+              <span className="sm:hidden">START</span>
             </Link>
           </div>
         </div>
+
+        {/* Mobile Menu */}
+        <AnimatePresence>
+          {mobileMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.3 }}
+              className="sm:hidden border-t border-border bg-white/95 backdrop-blur-md"
+            >
+              <div className="px-4 py-4 space-y-3">
+                <Link
+                  to="/products"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block px-4 py-2 text-sm font-medium text-foreground hover:bg-muted rounded-lg transition-colors"
+                >
+                  PRODUCTS
+                </Link>
+                <Link
+                  to="/pricing"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block px-4 py-2 text-sm font-medium text-foreground hover:bg-muted rounded-lg transition-colors"
+                >
+                  PRICING
+                </Link>
+                <Link
+                  to="/blog"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block px-4 py-2 text-sm font-medium text-foreground hover:bg-muted rounded-lg transition-colors"
+                >
+                  BLOG
+                </Link>
+                <button className="w-full flex items-center space-x-2 px-4 py-2 text-sm font-medium text-foreground hover:bg-muted rounded-lg transition-colors">
+                  <span>WATCH DEMO</span>
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </nav>
     </motion.header>
   );

@@ -61,52 +61,52 @@ const footerLinks = {
 const Footer = () => {
   return (
     <footer className="relative overflow-hidden">
-      {/* Underwater Background Image */}
-      <div className="relative h-[500px]">
+      {/* Underwater Background Image - Full height */}
+      <div className="relative h-[400px] sm:h-[500px] lg:h-[600px] w-full overflow-hidden bg-gradient-to-b from-[#1a3a3a] to-[#0a1f1f]">
         <img
           src="/images/footer-underwater.jpg"
           alt="Underwater scene"
-          loading="lazy"
-          className="w-full h-full object-cover"
+          loading="eager"
+          className="w-full h-full object-cover absolute inset-0 z-50"
+          onError={(e) => {
+            e.currentTarget.style.backgroundColor = '#0a1f1f';
+          }}
         />
-        {/* Gradient overlays */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0a1f1f] via-transparent to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-b from-white via-transparent to-transparent h-32" />
         
         {/* Glowing orbs animation */}
         <motion.div
-          className="absolute bottom-32 left-1/4 w-8 h-8 bg-white rounded-full blur-sm"
+          className="absolute bottom-20 sm:bottom-32 lg:bottom-40 left-1/4 w-8 sm:w-12 h-8 sm:h-12 bg-white rounded-full blur-xl z-20 shadow-lg"
           animate={{
-            opacity: [0.6, 1, 0.6],
-            scale: [1, 1.1, 1],
+            opacity: [0.4, 0.8, 0.4],
+            scale: [1, 1.2, 1],
           }}
           transition={{
-            duration: 3,
+            duration: 4,
             repeat: Infinity,
             ease: "easeInOut",
           }}
         />
         <motion.div
-          className="absolute bottom-32 right-1/4 w-8 h-8 bg-white rounded-full blur-sm"
+          className="absolute bottom-20 sm:bottom-32 lg:bottom-40 right-1/4 w-8 sm:w-12 h-8 sm:h-12 bg-white rounded-full blur-xl z-20 shadow-lg"
           animate={{
-            opacity: [0.6, 1, 0.6],
-            scale: [1, 1.1, 1],
+            opacity: [0.4, 0.8, 0.4],
+            scale: [1, 1.2, 1],
           }}
           transition={{
-            duration: 3,
+            duration: 4,
             repeat: Infinity,
             ease: "easeInOut",
-            delay: 1.5,
+            delay: 2,
           }}
         />
       </div>
 
-      {/* Footer Content */}
-      <div className="relative bg-[#0a1f1f] text-white py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 lg:gap-12">
+      {/* Footer Content - Positioned below image */}
+      <div className="relative bg-[#0a1f1f] text-white py-12 sm:py-16 px-4 sm:px-6 lg:px-8 border-t border-white/10">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-6 sm:gap-8 lg:gap-12">
             {/* Logo & Copyright */}
-            <div className="col-span-2 md:col-span-3 lg:col-span-1">
+            <div className="col-span-1 sm:col-span-2 lg:col-span-1">
               <Link to="/" className="flex items-center space-x-2 mb-4">
                 <svg
                   viewBox="0 0 24 24"
@@ -119,9 +119,9 @@ const Footer = () => {
                   <path d="M2 17l10 5 10-5" />
                   <path d="M2 12l10 5 10-5" />
                 </svg>
-                <span className="text-2xl font-medium tracking-tight">Adaline</span>
+                <span className="text-xl sm:text-2xl font-medium tracking-tight">Adaline</span>
               </Link>
-              <p className="text-sm text-white/60">
+              <p className="text-xs sm:text-sm text-white/60">
                 © 2026 Adaline. All rights reserved.
               </p>
             </div>
@@ -129,15 +129,15 @@ const Footer = () => {
             {/* Link Columns */}
             {Object.entries(footerLinks).map(([key, section]) => (
               <div key={key}>
-                <h3 className="text-xs font-medium text-white/40 uppercase tracking-wider mb-4">
+                <h3 className="text-xs font-medium text-white/40 uppercase tracking-wider mb-3 sm:mb-4">
                   {section.title}
                 </h3>
-                <ul className="space-y-2">
+                <ul className="space-y-1.5 sm:space-y-2">
                   {section.links.map((link) => (
                     <li key={link.name}>
                       <Link
                         to={link.href}
-                        className="text-sm text-white/70 hover:text-white transition-colors"
+                        className="text-xs sm:text-sm text-white/70 hover:text-white transition-colors"
                       >
                         {link.name}
                       </Link>

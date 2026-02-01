@@ -55,7 +55,7 @@ const StatsSection = () => {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.3 }}
             className="text-3xl sm:text-4xl font-medium tracking-tight text-foreground mb-4"
           >
             Precisely engineered for unparalleled reliability
@@ -64,7 +64,7 @@ const StatsSection = () => {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.1 }}
+            transition={{ duration: 0.3, delay: 0.05 }}
             className="text-muted-foreground max-w-2xl mx-auto"
           >
             Adaline powers the workflows of world-class product and engineering teams with unmatched performance and reliability.
@@ -96,12 +96,15 @@ const StatsSection = () => {
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="relative"
+          className="relative px-4"
         >
           <img
             src="/images/architecture-diagram.jpg"
             alt="Technical architecture diagram"
             className="w-full max-w-3xl mx-auto rounded-lg"
+            onError={(e) => {
+              e.currentTarget.style.backgroundColor = '#f5f5f0';
+            }}
           />
         </motion.div>
 

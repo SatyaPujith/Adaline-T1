@@ -66,7 +66,7 @@ const LibrarySection = () => {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.1 }}
+              transition={{ duration: 0.3, delay: 0.05 }}
               className="text-muted-foreground max-w-xl"
             >
               Find the knowledge to refine your AI-powered applications and unlock new possibilities across case studies, applied research, cookbooks, expert insights, practical guides, and more.
@@ -75,7 +75,7 @@ const LibrarySection = () => {
         </div>
 
         {/* Articles Grid */}
-        <div className="grid lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Featured Article */}
           {featuredArticle && (
             <motion.a
@@ -91,9 +91,12 @@ const LibrarySection = () => {
                   src={featuredArticle.image}
                   alt={featuredArticle.title}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  onError={(e) => {
+                    e.currentTarget.style.backgroundColor = '#f5f5f0';
+                  }}
                 />
               </div>
-              <div className="p-6">
+              <div className="p-4 sm:p-6">
                 <div className="flex items-center space-x-2 mb-3">
                   <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
                     {featuredArticle.category}
@@ -102,7 +105,7 @@ const LibrarySection = () => {
                     {featuredArticle.readTime}
                   </span>
                 </div>
-                <h3 className="text-xl font-medium text-foreground group-hover:text-primary transition-colors">
+                <h3 className="text-lg sm:text-xl font-medium text-foreground group-hover:text-primary transition-colors">
                   {featuredArticle.title}
                 </h3>
               </div>
@@ -110,7 +113,7 @@ const LibrarySection = () => {
           )}
 
           {/* Other Articles */}
-          <div className="grid sm:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             {otherArticles.slice(0, 4).map((article, index) => (
               <motion.a
                 key={article.title}
@@ -118,7 +121,7 @@ const LibrarySection = () => {
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
+                transition={{ duration: 0.3, delay: index * 0.05 }}
                 className="group block bg-white border border-border rounded-xl overflow-hidden hover:shadow-lg transition-shadow"
               >
                 <div className="aspect-video overflow-hidden">

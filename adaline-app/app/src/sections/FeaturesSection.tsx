@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, useScroll, AnimatePresence } from 'framer-motion';
 
 interface FeatureStep {
@@ -71,11 +71,11 @@ const FloatingImage = ({ src, style, delay = 0 }: { src: string; style: React.CS
     initial={{ opacity: 0, scale: 0.8 }}
     animate={{ opacity: 1, scale: 1 }}
     exit={{ opacity: 0, scale: 0.8 }}
-    transition={{ duration: 0.5, delay }}
+    transition={{ duration: 0.3, delay }}
     className="absolute bg-white rounded-lg shadow-lg overflow-hidden"
     style={style}
   >
-    <img src={src} alt="" className="w-full h-full object-cover" />
+    <img src={src} alt="" className="w-full h-full object-cover" loading="lazy" />
   </motion.div>
 );
 
@@ -106,9 +106,9 @@ const FeaturesSection = () => {
 
   return (
     <div ref={containerRef} className="relative" style={{ height: '400vh' }}>
-      <div className="sticky top-0 h-screen bg-white overflow-hidden">
+      <div className="sticky top-0 h-screen bg-white overflow-hidden relative">
         {/* Step Indicators */}
-        <div className="absolute top-20 left-8 right-8 flex items-center justify-between z-20">
+        <div className="absolute top-14 sm:top-16 lg:top-20 left-3 sm:left-4 lg:left-8 right-3 sm:right-4 lg:right-8 flex items-center justify-between z-20 overflow-x-auto pb-2 gap-2 sm:gap-4">
           {features.map((feature, index) => (
             <motion.button
               key={feature.id}
@@ -116,11 +116,11 @@ const FeaturesSection = () => {
                 setActiveFeature(index);
                 setActiveSubStep(0);
               }}
-              className="flex items-center space-x-3 group"
+              className="flex items-center space-x-1 sm:space-x-2 lg:space-x-3 group flex-shrink-0"
               whileHover={{ scale: 1.02 }}
             >
               {/* Animated Circle */}
-              <div className="relative w-12 h-12">
+              <div className="relative w-8 sm:w-10 lg:w-12 h-8 sm:h-10 lg:h-12">
                 <motion.svg
                   width="48"
                   height="48"
@@ -141,7 +141,7 @@ const FeaturesSection = () => {
                       stroke: index === activeFeature ? "#1a1a1a" : "#e5e5e5",
                       rotate: index === activeFeature ? 0 : 360
                     }}
-                    transition={{ duration: 0.5 }}
+                    transition={{ duration: 0.3 }}
                   />
                   {/* Inner crosshair */}
                   {index === activeFeature && (
@@ -157,7 +157,7 @@ const FeaturesSection = () => {
                 </div>
               </div>
               
-              <div className="text-left">
+              <div className="text-left hidden sm:block">
                 <span className={`text-xs font-medium transition-colors ${
                   index === activeFeature ? 'text-foreground' : 'text-muted-foreground'
                 }`}>
@@ -183,16 +183,16 @@ const FeaturesSection = () => {
         </div>
 
         {/* Main Content */}
-        <div className="absolute top-36 left-8 right-8 bottom-8 grid grid-cols-2 gap-12">
+        <div className="absolute top-20 sm:top-20 lg:top-36 left-3 sm:left-4 lg:left-8 right-3 sm:right-4 lg:right-8 bottom-3 sm:bottom-4 lg:bottom-8 grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-12">
           {/* Left - Text Content */}
-          <div className="flex flex-col">
+          <div className="flex flex-col min-h-0">
             {/* Tabs */}
-            <div className="flex items-center space-x-1 bg-muted rounded-lg p-1 mb-8 w-fit">
+            <div className="flex items-center space-x-1 bg-muted rounded-lg p-1 mb-4 sm:mb-6 lg:mb-8 w-fit overflow-x-auto">
               {currentFeature.tabs.map((tab, index) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(index)}
-                  className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all ${
+                  className={`px-2 sm:px-3 py-1 sm:py-1.5 text-[10px] sm:text-xs font-medium rounded-md transition-all whitespace-nowrap ${
                     activeTab === index
                       ? 'bg-white text-foreground shadow-sm'
                       : 'text-muted-foreground hover:text-foreground'
@@ -212,17 +212,17 @@ const FeaturesSection = () => {
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.4 }}
               >
-                <h2 className="text-2xl font-medium text-foreground mb-3">
+                <h2 className="text-base sm:text-lg lg:text-2xl font-medium text-foreground mb-2 sm:mb-3 lg:mb-3">
                   {currentFeature.title}
                 </h2>
-                <p className="text-muted-foreground text-sm mb-8 max-w-md">
+                <p className="text-muted-foreground text-[11px] sm:text-xs lg:text-sm mb-4 sm:mb-6 lg:mb-8 max-w-md line-clamp-3 sm:line-clamp-none">
                   {currentFeature.description}
                 </p>
               </motion.div>
             </AnimatePresence>
 
             {/* Sub-steps Accordion */}
-            <div className="space-y-0 flex-1">
+            <div className="space-y-0 flex-1 overflow-y-auto max-h-[300px] sm:max-h-[400px] lg:max-h-none">
               {currentFeature.subSteps.map((subStep, index) => (
                 <motion.div
                   key={subStep.title}
@@ -233,14 +233,14 @@ const FeaturesSection = () => {
                 >
                   <button
                     onClick={() => setActiveSubStep(index)}
-                    className="w-full py-4 text-left group"
+                    className="w-full py-2 sm:py-3 lg:py-4 text-left group"
                   >
-                    <div className="flex items-start space-x-4">
-                      <span className="text-sm text-muted-foreground mt-0.5">
+                    <div className="flex items-start space-x-2 sm:space-x-3 lg:space-x-4">
+                      <span className="text-[10px] sm:text-xs lg:text-sm text-muted-foreground mt-0.5 flex-shrink-0">
                         {String(index + 1).padStart(2, '0')}
                       </span>
-                      <div className="flex-1">
-                        <span className={`text-sm font-medium transition-colors ${
+                      <div className="flex-1 min-w-0">
+                        <span className={`text-[11px] sm:text-xs lg:text-sm font-medium transition-colors block ${
                           activeSubStep === index ? 'text-foreground' : 'text-muted-foreground group-hover:text-foreground'
                         }`}>
                           {subStep.title}
@@ -252,7 +252,7 @@ const FeaturesSection = () => {
                               animate={{ height: 'auto', opacity: 1 }}
                               exit={{ height: 0, opacity: 0 }}
                               transition={{ duration: 0.3 }}
-                              className="text-sm text-muted-foreground mt-2 overflow-hidden"
+                              className="text-[10px] sm:text-xs lg:text-sm text-muted-foreground mt-1 sm:mt-2 overflow-hidden"
                             >
                               {subStep.desc}
                             </motion.p>
@@ -266,8 +266,8 @@ const FeaturesSection = () => {
             </div>
           </div>
 
-          {/* Right - Visual Grid */}
-          <div className="relative">
+          {/* Right - Visual Grid - Hidden on mobile */}
+          <div className="hidden lg:block relative">
             {/* Dashed grid background */}
             <div 
               className="absolute inset-0 border border-dashed border-border rounded-lg"
